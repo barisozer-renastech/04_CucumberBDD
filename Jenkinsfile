@@ -4,18 +4,13 @@ def slackChannelID = 'C03NE82PLMQ'
 
 pipeline {
   agent any
-  tools {
-    maven 'Maven 3.3.9'
-    jdk 'jdk8'
-  }
   triggers{
     cron 'H 2,16 * * *'
   }
   stages {
     stage('Run Tests') {
       steps {
-        sh 'mvn clean'
-        sh 'mvn test'
+        sh './mvnw clean test'
       }
     }
   }

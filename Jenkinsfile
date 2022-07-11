@@ -1,8 +1,16 @@
-node {
-  stage ('Build') {
-    git url: 'https://github.com/barisozer-renastech/04_CucumberBDD'
-    withMaven {
-      sh "mvn clean verify"
-    } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe reports and FindBugs reports
+pipeline {
+  agent any
+  stages {
+    stage('Run Tests') {
+      steps {
+        sh './mvnw clean test'
+      }
+      post {
+        always {
+          junit '**/surefire-reports/*.xml'
+          cucumber buildStatus: 'null', customCssFiles: '', customJsFiles: '', failedFeaturesNumber: -1, failedScenariosNumber: -1, failedStepsNumber: -1, fileIncludePattern: 'target/cucumber.json', pendingStepsNumber: -1, skippedStepsNumber: -1, sortingMethod: 'ALPHABETICAL', undefinedStepsNumber: -1
+        }
+      }
+    }
   }
 }

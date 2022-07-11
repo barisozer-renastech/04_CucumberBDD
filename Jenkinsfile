@@ -1,16 +1,30 @@
 pipeline {
-  agent any
-  stages {
-    stage('Run Tests') {
-      steps {
-        sh './mvnw clean test'
-      }
-      post {
-        always {
-          junit '**/surefire-reports/*.xml'
-          cucumber buildStatus: 'null', customCssFiles: '', customJsFiles: '', failedFeaturesNumber: -1, failedScenariosNumber: -1, failedStepsNumber: -1, fileIncludePattern: 'target/cucumber.json', pendingStepsNumber: -1, skippedStepsNumber: -1, sortingMethod: 'ALPHABETICAL', undefinedStepsNumber: -1
-        }
-      }
+    agent any
+    tools {
+        maven "MAVEN"
+        jdk "JDK"
     }
-  }
+    stages {
+        stage('Initialize'){
+            steps{
+                echo "PATH = ${M2_HOME}/bin:${PATH}"
+                echo "M2_HOME = /opt/maven"
+            }
+        }
+        stage('Build') {
+            steps {
+                dir("/var/lib/jenkins/workspace/maventest") {
+                sh 'mvn clean verify'
+                }
+            }
+        }
+     }
+    post {
+       always {
+          junit(
+        allowEmptyResults: true,
+        testResults: '*/test-reports/.xml'
+      )
+      }
+   }
 }
